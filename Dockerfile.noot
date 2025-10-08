@@ -1,0 +1,16 @@
+FROM reg.mini.dev/python:3.13-dev AS builder 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/myapp/venv/bin:$PATH"
+EXPOSE 8000
+WORKDIR /myapp 
+RUN python -m venv /myapp/venv
+RUN pip3 install flask
+COPY src/ /myapp/ 
+
+FROM reg.mini.dev/python:3.13-dev
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/myapp/venv/bin:$PATH"
+COPY --chown=1000:1000 --from=builder /myapp /myapp
+ENTRYPOINT ["python3"] 
+CMD [/myapp/manage.py", "runserver", "0.0.0.0:8000"]
